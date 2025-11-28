@@ -1,0 +1,65 @@
+1) 
+-- table student(ID, name, CGPA, completed_credit)
+
+CREATE TABLE student(
+	ID INT PRIMARY KEY,
+  	name VARCHAR(55),
+  	CGPA FLOAT,
+  	completed_credit INT
+);
+
+
+2)
+
+CREATE TABLE course ( 
+  course_code VARCHAR(20) PRIMARY KEY, 
+  course_name VARCHAR(50) NOT NULL, -- it is not possible to be empty
+  credit INT 
+);
+
+
+3)
+ --  allocate any attribute float size (total digit ,after decimal)
+
+ALTER TABLE student DROP COLUMN CGPA;
+ALTER TABLE student ADD COLUMN CGPA FLOAT(3,2);
+
+
+4)
+-- insert data in any table;
+INSERT INTO student(ID,name,completed_credit,CGPA)
+VALUES(1,'A',32,2.56);
+
+INSERT INTO student(ID,name,completed_credit,CGPA)
+VALUES(1,'A',32,2.56);
+
+
+5)
+INSERT INTO course(course_code,course_name,credit)
+VALUES('CSE_3521','DBMS_theory',3);
+
+
+6)
+CREATE TABLE course_taken(
+	ID INT,  -- foreign key from student table
+  	course_code VARCHAR(20), -- foreign key from course table
+   	CONSTRAINT fk_course_taken FOREIGN KEY(course_code) REFERENCES course(course_code),
+  	CONSTRAINT fk_student_id FOREIGN KEY(ID) REFERENCES student(ID)
+ );
+
+7)
+INSERT INTO course(course_code)
+VALUES('cse3232');
+
+INSERT INTO course(course_code)
+VALUES('cse33632');
+
+INSERT INTO course_taken(ID,course_code)
+VALUES(3,'cse3432');
+
+8)
+SELECT name
+FROM student WHERE completed_credit>20;
+9)
+SELECT name
+FROM student WHERE completed_credit>20 AND completed_credit<40;
