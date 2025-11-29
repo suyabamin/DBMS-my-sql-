@@ -1,0 +1,26 @@
+--ALTer---
+ALTER TABLE student
+CHANGE COLUMN gender G VARCHAR(255);
+
+
+ALTER TABLE student
+ADD COLUMN age INT(2)
+
+--UPDATE--
+
+UPDATE student
+SET age=18
+WHERE age=NULL
+
+--delete row--
+DELETE FROM student
+WHERE ID=5;
+
+
+constant--
+CONSTRAINT unique_student_id UNIQUE(student_id, course_id, semester, year)
+
+foreign key-----
+
+student_id INT NOT NULL,
+CONSTRAINT fk_student_id FOREIGN KEY(student_id)REFERENCES student(student_id),
