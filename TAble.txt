@@ -1,0 +1,56 @@
+1)
+CREATE TABLE student(
+student_id int PRIMARY KEY,
+    full_name VARCHAR(255) NOT NULL,
+    email VARCHAR(255)NOT NULL UNIQUE,
+    date_of_birth DATE NOT NULL,
+    gender VARCHAR(10) CHECK(gender='MALE'or gender='FEMAIL'or gender='Other'),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+2)
+CREATE TABLE departments(
+dept_id int PRIMARY KEY,
+    dept_name VARCHAR(255) NOT NULL,
+    building VARCHAR(255),
+    budget int CHECK (budget>0)
+
+);
+
+3)
+CREATE TABLE courses(
+course_id int PRIMARY KEY,
+    course_code VARCHAR(255) UNIQUE NOT NULL,
+    course_title VARCHAR(255) NOT NULL,
+    credit int CHECK (credit BETWEEN 1 AND 4) ,
+    dept_id int NOT NULL,
+    CONSTRAINT fk_detp_id FOREIGN KEY(dept_id) REFERENCES departments(dept_id)
+);
+
+4)
+
+CREATE TABLE teachers(
+teacher_id int PRIMARY KEY,
+    teacher_name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    salary int CHECK (salary>=1000),
+    dept_id int ,
+    CONSTRAINT fk_dept_id FOREIGN KEY (dept_id) REFERENCES departments(dept_id)
+   
+);
+
+5)
+CREATE TABLE course_registrations(
+reg_id int PRIMARY KEY,
+    student_id INT NOT NULL,
+   CONSTRAINT fk_student_id FOREIGN KEY(student_id)REFERENCES student(student_id),
+    course_id int NOT NULL,
+    CONSTRAINT fk_course_id FOREIGN KEY(course_id) REFERENCES courses(course_id),
+    semester VARCHAR(255) NOT NULL CHECK(semester='Spring'OR semester='Summer'OR semester='Fall'),
+  
+    year INT CHECK (year >= 2000),
+    
+   CONSTRAINT unique_student_id UNIQUE(student_id, course_id, semester, year)
+    
+   
+);
