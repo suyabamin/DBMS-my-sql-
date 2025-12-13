@@ -1,0 +1,216 @@
+1. Show employee names and salary.
+
+SELECT first_name,last_name,salary
+FROM employees;
+
+2. Show employees earning more than 5000.
+
+SELECT first_name,last_name,salary
+FROM employees
+WHERE salary>5000;
+
+3. Show all job titles.
+
+SELECT job_id,job_title
+FROM jobs;
+
+4. Show departments sorted alphabetically.
+
+SELECT department_name
+FROM departments
+ORDER BY department_name;
+
+5. Show locations in the city starting with 'S'.
+
+SELECT location_id,city
+FROM locations
+WHERE city LIKE 's%';
+
+6. Count the number of employees per job_id.
+
+SELECT job_id, COUNT(*)
+FROM employees
+GROUP BY job_id;
+
+7. Find departments having more than 3 employees.
+
+SELECT department_id,COUNT(*)
+FROM employees
+GROUP BY department_id
+HAVING COUNT(*)>3;
+
+8. Show average salary for each department.
+
+SELECT department_id, AVG(salary)
+FROM employees
+GROUP BY department_id
+
+9. List job_ids where max_salary > 15000.
+SELECT job_id, max_salary
+FROM jobs
+WHERE max_salary > 15000;
+
+10. Count employees hired each year.
+
+SELECT EXTRACT(YEAR FROM hire_date), COUNT(*) 
+FROM employees
+GROUP BY EXTRACT(YEAR FROM hire_date)
+ORDER BY hire_date;
+
+-- 11. Show the number of employees for each salary level (group by salary).
+
+SELECT salary,COUNT(*)
+FROM employees
+GROUP BY salary
+ORDER BY salary DESC;
+
+-- 12. Show job_ids where avg salary (in employees table) is between 5000 and 10000.
+
+SELECT job_id ,AVG(salary)
+FROM employees
+GROUP BY job_id
+HAVING AVG(salary)BETWEEN 5000 AND 10000;
+
+-- 13. Count employees per commission_pct.
+
+SELECT job_id,commission_pct,COUNT(*)
+FROM employees
+GROUP BY commission_pct;
+
+-- 14. Show years in which more than 10 employees were hired.
+SELECT EXTRACT(YEAR FROM hire_date) as hire_year,COUNT(*) as hires
+FROM employees
+GROUP BY EXTRACT(YEAR FROM hire_date)
+HAVING COUNT(*)>10;
+
+
+-- 15. Find min, max, and avg salary per department.
+SELECT department_id, MAX(salary)as max_salary,MIN(salary)as min_salary,AVG(salary)as avg_salary
+FROM employees
+GROUP BY department_id;
+
+Practice:
+
+-- 16)List all employees ordered by hire date.
+SELECT employee_id,hire_date
+FROM employees
+ORDER BY hire_date;
+
+
+-- 17 Find all employees with NULL commission_pct.
+SELECT employee_id,first_name
+FROM employees
+WHERE commission_pct IS NULL;
+
+-- 18 Show employees whose last name starts with 'A'
+
+SELECT first_name,last_name
+FROM employees
+WHERE last_name LIKE 'A%';
+
+-- 19)Show all job_ids where min_salary < 5000.
+SELECT job_id, min_salary
+FROM jobs
+WHERE min_salary < 5000;
+
+
+-- 20 Show all employees who have a manager_id.
+SELECT *
+FROM employees
+WHERE manager_id IS NOT NULL
+
+
+-- 22) List unique job_ids from employees table.
+SELECT DISTINCT job_id
+FROM employees
+
+-- 23List employees earning between 8000 and 12000.
+SELECT employee_id,salary
+FROM employees
+WHERE salary BETWEEN 8000 AND 12000
+
+-- 24 Count employees with each distinct commission_pct value.
+SELECT employee_id, COUNT(*)
+FROM employees
+GROUP BY commission_pct;
+
+-- 25)Display employees hired in 2006.
+SELECT *
+FROM employees
+WHERE hire_date BETWEEN '2006-01-01' AND '2006-12-31';
+
+-- 26 Count departments by unique manager_id.
+SELECT manager_id, COUNT(*)
+FROM departments 
+WHERE manager_id IS NOT NULL
+GROUP BY manager_id;
+
+-- 27 Show unique city names from locations.
+SELECT DISTINCT city
+FROM locations
+
+-- 28 Count how many countries exist in each region_id.
+SELECT region_id, COUNT(*)
+FROM regions
+ORDER BY region_id
+
+-- 29 Show employees with 2 decimal places in salary.
+
+SELECT  employee_id, first_name, last_name,FORMAT(salary, 2) AS salary
+FROM employees;
+
+-- 31 Sort employees by department_id then by salary descending.
+SELECT employee_id
+FROM employees
+ORDER BY department_id ASC, salary DESC
+
+-- 32 List employees with last_name length > 5.
+
+SELECT *
+FROM employees
+WHERE LENGTH(last_name)>5
+
+
+-- 33 Count how many employees have email ending with '.com'.
+SELECT count(*)
+FROM employees
+WHERE email LIKE '%.com'
+
+-- 34 how departments where department_name starts with 'A'.
+SELECT department_name
+FROM departments
+WHERE department_name LIKE 'A%'
+
+-- 35  Count job_history entries by employee_id.
+SELECT employee_id,COUNT(*)
+FROM job_history
+GROUP BY employee_id;
+
+-- 36 List job_history rows where end_date < start_date (invalid data check).
+SELECT *
+FROM job_history
+WHERE end_date< start_date;
+
+-- 38 List employees with a phone_number containing ‘123’.
+SELECT phone_number
+FROM employees
+WHERE phone_number LIKE '%123%'
+
+--37 Count employees with salaries divisible by 1000
+SELECT count(*)
+FROM employees
+WHERE salary % 1000=0;
+
+-- 39)Count employees whose first name and last name start with the same letter.
+SELECT first_name,last_name
+FROM employees 
+WHERE LEFT(first_name,1)=LEFT(LAST_name,1)
+
+-- 40 Show all regions ordered by region_name.
+SELECT *
+FROM regions
+ORDER BY region_name;
+
+
+
+
