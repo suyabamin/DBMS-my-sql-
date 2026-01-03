@@ -1,0 +1,135 @@
+-- 1  Problem 1: Filter by Multiple Locations (IN)
+Question:  Find the first name, last name, and job ID of all employees who work in the departments
+located in either ’Seattle’ or ’Toronto’.
+
+SELECT e.first_name,e.last_name,e.job_id
+FROM employees e JOIN departments d ON e.department_id=d.department_id JOIN locations l ON d.location_id=l.location_id
+WHERE l.city='Seattle' OR l.city='Toronto'
+
+or
+
+SELECT e.first_name,e.last_name,e.job_id
+FROM employees e JOIN departments d ON e.department_id=d.department_id JOIN locations l ON d.location_id=l.location_id
+WHERE l.city IN ('Seattle','Toronto');
+
+
+-- 2
+Problem 2: Departments with Specific Job Roles (IN with Subquery)
+Question: List the names of all departments that currently have an employee with the Job Title
+’Programmer’.
+
+
+********SELECT d.department_name
+FROM departments d JOIN employees e ON d.department_id=e.department_id
+WHERE e.job_id IN(
+SELECT job_id
+FROM jobs 
+WHERE job_title ='Programmer')
+
+SELECT department_name
+FROM departments
+WHERE department_id IN(
+SELECT e.department_id
+FROM employees e JOIN jobs j ON e.job_id=j.job_id
+WHERE j.job_title='Programmer');
+
+
+3
+-- Question: Retrieve the Department IDs and Names of departments that do not exist in the Employees
+-- table (i.e., departments with zero employees).
+SELECT department_id,department_name
+FROM departments
+WHERE department_id NOT IN(
+SELECT DISTINCT department_id
+FROM employees
+  WHERE department_id IS NOT NULL
+    );
+
+4
+-- Problem 4: Employees with Managers (EXISTS)
+-- Question: Find the details of all employees who are also Managers (i.e., their --Employee ID appears
+-- in the ‘MANAGERID‘columnof theEmployeestable).
+
+SELECT e.employee_id
+FROM employees e 
+WHERE EXISTS( 
+SELECT 1
+FROM employees f
+  --  WHERE e.employee_id=f.manager_id
+ WHERE f.manager_id=e.employee_id
+);
+
+5
+-- Problem 5: Locations without Departments (NOT EXISTS)
+-- Question: List all cities that do not have any department associated with them.
+SELECT city
+FROM locations l
+WHERE NOT EXISTS(
+SELECT 1
+FROM departments d
+WHERE d.location_id=l.location_id);
+
+6
+-- Problem 6: Historical Consistency (NOT EXISTS)
+-- Question: Find employees who have never changed their job (i.e., they do not appear in the ‘ ‘JOBHIST ORY ‘table)
+SELECT e.employee_id
+FROM employees e
+WHERE NOT EXISTS(
+SELECT 1
+FROM job_history j
+WHERE e.employee_id=j.employee_id)
+
+7
+-- Problem 7: Salary Comparison ( > ANY)
+-- Question: Find the employees who earn a salary higher than the lowest salary earned by any employee in Department 60 (IT).
+SELECT employee_id,first_name
+FROM employees
+WHERE salary>any(
+
+SELECT salary
+FROM employees
+WHERE department_id=60
+    )
+
+8
+-- Problem 8: Elite Earners ( > ALL)
+-- Question: Find the employees who earn more than every employee in Department 50 (Shipping)
+SELECT employee_id
+FROM employees
+WHERE salary>all(
+
+SELECT salary
+FROM employees 
+WHERE department_id=50);
+
+9
+-- Problem 9: Hired Before Everyone in a Region (< ALL)
+-- Question: Find employees hired before all employees who work in the ’Europe’ region (Region Id 1)
+SELECT employee_id
+FROM employees
+WHERE hire_date<ALL
+(SELECT e.hire_date
+ FROM employees e JOIN departments d ON e.department_id=d.department_id JOIN locations l ON d.location_id=l.location_id JOIN countries c ON l.country_id=c.country_id
+ WHERE c.region_id=1
+);
+
+10
+-- Problem 10: Above Average for Their Department
+-- Question: List employees (Name and Salary) who earn more than the average salary of the department they belong to.
+SELECT e.employee_id
+FROM employees e
+WHERE e.salary>(SELECT AVG(f.salary)
+                FROM employees f
+            WHERE  e.department_id=f.department_id
+                );
+
+11
+-- Problem 11: Department Stats (Subquery in FROM)
+-- Question: Display the Department Name and the difference between the maximum and minimum salary in that department.
+
+SELECT d.department_name, s.salary_difference
+FROM departments d JOIN(
+    SELECT department_id, (MAX(salary)-MIN(salary))AS salary_difference
+    FROM employees 
+    GROUP BY department_id
+    )s ON d.department_id=s.department_id;
