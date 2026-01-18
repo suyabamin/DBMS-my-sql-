@@ -1,0 +1,292 @@
+
+
+-- ct3
+SELECT *
+FROM employees e
+WHERE e.salary= (     
+SELECT max(salary)
+FROM employees f
+WHERE e.salary=f.salary
+)
+
+
+
+3
+-- Find departments offering multiple types of job positions. (employees of those Departments hold different types of jobs)
+SELECT department_id,COUNT(DISTINCT job_id) as d
+FROM  employees
+GROUP BY department_id
+HAVING d>1
+
+
+4-- Find departments with at least one employee earning over 5k.
+SELECT *
+FROM employees e
+WHERE e.department_id IN(
+    SELECT f.department_id
+    FROM employees f 
+    WHERE f.salary>5000
+    )
+
+
+5-- Find departments with multiple managers.
+SELECT department_id,COUNT(DISTINCT employee_id)
+FROM employees
+WHERE employee_id IN (SELECT DISTINCT manager_id FROM employees)
+GROUP BY department_id
+HAVING COUNT(DISTINCT employee_id)>1 ;      
+
+
+-- 1) Find all employees who earn above average salary in his/her Department
+SELECT e.employee_id
+FROM employees e 
+WHERE e.salary>(
+SELECT AVG(f.salary)
+FROM employees f 
+WHERE e.department_id=f.department_id
+)
+
+
+
+-- 2) Find employees whose manager earns less than him/her.
+
+SELECT *
+FROM employees e 
+WHERE e.salary>(
+    SELECT f.salary
+    FROM employees f 
+    WHERE f.employee_id=e.manager_id
+    )
+
+
+
+--  3) Find employees who earn 2000 less than expected for his/her job. (check the maximum salary of that job from job table)
+
+SELECT *
+FROM employees e
+WHERE e.salary<=(
+    SELECT j.max_salary -2000
+    FROM jobs j 
+    WHERE e.job_id=j.job_id
+    );                                                                 
+
+
+
+
+
+TABLE CREATION
+
+CREATE TABLE student(
+student_id INT PRIMARY KEY,
+ full_name VARCHAR(20)NOT NULL,
+ email  VARCHAR(20) UNIQUE NOT NULL,
+ date_of_birth DATE NOT NULL,
+ gender VARCHAR(20)CHECK (gender IN ('MALE','FEMALE','OTHER')),
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+)
+
+
+
+CREATE TABLE departments(
+    dept_id int PRIMARY KEY,
+     dept_name VARCHAR(20) UNIQUE NOT NULL,
+    building VARCHAR(20),
+    budget INT CHECK(budget>0)
+)
+
+
+
+CREATE TABLE courses ( 
+    course_id       INT PRIMARY KEY, 
+    course_code     VARCHAR(20) NOT NULL UNIQUE, 
+    course_title    VARCHAR(150) NOT NULL, 
+    credit          INT CHECK (credit BETWEEN 1 AND 4), 
+    dept_id         INT NOT NULL, 
+    CONSTRAINT fk_dept_id FOREIGN KEY (dept_id) REFERENCES departments(dept_id) 
+); 
+
+
+
+
+
+CREATE TABLE  teachers(
+    teacher_id int PRIMARY KEY, 
+teacher_name VARCHAR(20),
+email VARCHAR(30) UNIQUE NOT NULL, 
+salary int CHECK(salary>=10000),
+    dept_id INT ,
+    CONSTRENT fk_dept_id FOREIGN KEY(dept_id)REFERENCES departments(dept_id)
+    )
+
+
+
+-- 1. Show employee names and salary.
+SELECT first_name,salary
+FROM employees
+
+
+-- 2. Show employees earning more than 5000.
+SELECT *
+FROM employees
+WHERE salary>5000;
+
+
+-- 3. Show all job titles.
+SELECT job_title
+FROM jobs
+
+
+
+-- 4. Show departments sorted alphabetically.
+SELECT department_id,department_name
+FROM departments
+ORDER BY department_name ASC;
+
+
+
+-- 5. Show locations in the city starting with 'S'.
+SELECT location_id,city
+FROM locations
+WHERE city LIKE's%';
+
+
+
+
+
+
+
+
+----------------practice problem-----------
+
+
+-- 1 Retrieve first name, last name and countries of customers living in countries other than the USA.
+SELECT first_name,last_name ,country 
+FROM customers
+WHERE country <> 'USA';
+
+
+-- 2  List all orders with a total amount that have a total amount greater than 200 and status “Delivered”.
+
+SELECT order_id,total_amount
+FROM orders
+WHERE total_amount>200 AND status ='Delivered';
+
+
+
+-- c  List all product names that belong to the “Home & Kitchen” category.
+SELECT product_name
+FROM products p JOIN  categories c ON p.category_id=p.category_id
+WHERE c.category_name='Home & Kitchen'
+
+
+-- d Find all customers’ first name and email whose email contains “example.com”.
+
+SELECT first_name, email
+FROM customers
+WHERE email LIKE '%example.com'
+
+
+
+-- e Find all customers’ first name and last name whose last names have exactly 5 characters.
+SELECT first_name,last_name
+FROM customers
+WHERE last_name LIKE '_____'
+
+
+-- f Find all customer first and last names that contain the letter ‘a’ at least twice in first name or last name or both.
+SELECT *
+FROM customers 
+WHERE last_name LIKE '%a%a%' OR first_name LIKE '%a%a%';
+
+
+-- g Calculate the total revenue (sum of unit_price × quantity) from Order_Details.
+SELECT order_id, sum(unit_price *quantity )
+FROM order_details
+
+
+
+-- h List the category names and how many products each category has.
+SELECT c.category_name, COUNT(p.product_id) AS total_products
+FROM products p JOIN categories c ON p.category_id=c.category_id
+GROUP BY c.category_name;
+
+
+
+-- i Get the product name and the total quantity sold per product.
+
+SELECT p.product_name, SUM(o.quantity)
+FROM products p JOIN order_details o ON p.product_id=o.product_id
+GROUP BY p.product_name
+
+
+-- j Find customers’ first name and last name who have placed at least one order with status “Delivered”.
+SELECT first_name,last_name
+FROM customers c
+WHERE EXISTS ( SELECT 1
+              FROM orders o 
+              WHERE c.customer_id=o.customer_id AND o.status='Delivered'
+              );
+              
+
+-- k  Find product names that have received reviews with an average rating greater than 4.5.
+SELECT p.product_name
+FROM products p JOIN reviews r ON p.product_id=r.product_id
+GROUP BY p.product_name
+HAVING AVG(r.rating)>4.5
+
+
+-- n Display product names that have equal or more reviews than the average number of reviews per product.
+
+SELECT product_name
+FROM products
+WHERE product_id in(
+    SELECT product_id
+    FROM reviews
+    GROUP BY product_id
+    HAVING count(*)>=(
+        SELECT AVG(review_count)
+        FROM(
+            SELECT COUNT(*) as review_count
+            FROM reviews
+            GROUP BY product_id
+            ) AS t
+    )
+);
+
+
+-- o List all reviews with review ids, product names, customer first names, rating and review texts.
+SELECT r.review_id,p.product_name,c.first_name, r.rating,r.review_text
+FROM products p JOIN reviews r ON r.product_id=r.product_id JOIN customers c ON r.customer_id=c.customer_id
+
+
+
+-- q Display all customers’ first name and the total number of orders they have placed.
+
+SELECT c.first_name,c.last_name,COUNT(o.order_id)
+FROM customers c JOIN orders  o ON c.customer_id=o.order_id
+GROUP BY c.first_name ,c.last_name
+
+
+
+
+
+
+
+
+
+
+
+
+
+2   CREATE TABLE Courses (
+    course_id int PRIMARY KEY,
+    course_name VARCHAR(20)NOT NULL,
+    instructor_name VARCHAR(20),
+    credits int ,
+    department varchar(20),
+    semester VARCHAR(20)
+    
+    );
+
+
